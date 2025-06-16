@@ -1,0 +1,109 @@
+/* Landing.css */
+.landing-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1500&q=80') center center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.landing-overlay {
+  background: rgba(0, 0, 0, 0.55);
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.landing-content {
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  max-width: 420px;
+  width: 90vw;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  text-align: center;
+  z-index: 2;
+}
+.landing-content h1 {
+  font-size: 2.2rem;
+  color: #4f8cff;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+}
+.landing-content .brand {
+  color: #222;
+}
+.landing-content p {
+  color: #222;
+  font-size: 1.08rem;
+  margin-bottom: 1.2rem;
+}
+.landing-content .highlight {
+  color: #4f8cff;
+  font-weight: 600;
+}
+.landing-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 1.2rem 0 0 0;
+}
+.landing-content li {
+  font-size: 1rem;
+  color: #333;
+  margin: 0.7rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.landing-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.landing-btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  color: #4f8cff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.landing-btn.primary {
+  background: #4f8cff;
+  color: #fff;
+}
+.landing-btn:hover {
+  background: #e6f0ff;
+  color: #222;
+}
+.landing-btn.primary:hover {
+  background: #2563eb;
+  color: #fff;
+}
+@media (max-width: 600px) {
+  .landing-content {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .landing-content h1 {
+    font-size: 1.4rem;
+  }
+  .landing-content p, .landing-content li {
+    font-size: 0.98rem;
+  }
+  .landing-actions {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+}
