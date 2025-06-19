@@ -1,6 +1,7 @@
 // index.js
 import express from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
 import notesRoutes from './routes/notesRoutes.js';
 
@@ -8,6 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/users', userRoutes);
 app.use('/api/notes', notesRoutes);
