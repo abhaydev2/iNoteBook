@@ -1,13 +1,26 @@
-const mongoose = require('mongoose');
-const mongoURI = "mongodb+srv://abhaydevadev7:1A1WC566oZ1FSTJB@cluster0.pkdl9ye.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-const connectToMongo = async () => {
+const sequelize = new Sequelize({
+    dialect: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'your_password',
+    database: process.env.DB_NAME || 'inotebook',
+    logging: false
+});*
+
+
+
+
+const connectToDatabase = async () => {
     try {
-        await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-        console.log("Connected to MongoDB");
+        await sequelize.authenticate();
+        await sequelize.sync();
+        console.log('Connected to PostgreSQL database');
     } catch (error) {
-        console.error("Error connecting to MongoDB:", error.message);
+        console.error('Error connecting to PostgreSQL:', error.message);
     }
 };
 
-module.exports = connectToMongo;
+module.exports = { sequelize, connectToDatabase };

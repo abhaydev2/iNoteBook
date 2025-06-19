@@ -1,27 +1,38 @@
-const mongoose =require('mongoose');
-const { Schema } = mongoose;
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db');
+const User = require('./User');
 
-const NotesSchema = new Schema({
-  user:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:'user'
-  },
-  title:{
-    type:String,
-    required:true
-  },
-  description:{
-    type:String,
-    required:true
-  },
-  tag:{
-    type:String,
-    default:"General"
-    
-  },
-  date:{
-    type:Date,
-     default:Date.now
-  },
+const Note = sequelize.define('Note', {
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    tag: {
+        type: DataTypes.STRING,
+        defaultValue: "General"
+    },
+    date: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id'
+        }
+    }
+}, {
+    timestamps: true
 });
-module.exports=mongoose.model('notes',NotesSchema)
+
+// Define the relationship
+Note.belongsTo(User);
+User.hasMany(Note);
+
+module.exports = Note;

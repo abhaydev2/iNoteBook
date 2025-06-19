@@ -5,9 +5,11 @@ const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fetchUser = require("../middleware/fetchUser");
-const JWT_SECRET = "Aayush@s@good";
+require('dotenv').config();
 
-// ROUTE:1  Create a user using: POST "/api/auth/". No login required
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// ROUTE:1  Create a user using: POST "/api/auth/createuser"
 router.post(
   "/createuser",
   [
@@ -20,13 +22,16 @@ router.post(
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({success, errors: errors.array() });
+      return res.status(400).json({ success, errors: errors.array() });
     }
 
     try {
-      let user = await User.findOne({ email: req.body.email });
+      let user = await User.findOne({ 
+        where: { email: req.body.email }
+      });
+
       if (user) {
-        return res.status(400).json({success, error: "Sorry, user already exists" });
+        return res.status(400).json({ success, error: "Sorry, user already exists" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -46,24 +51,21 @@ router.post(
       };
 
       const authtoken = jwt.sign(data, JWT_SECRET);
-
-success=true;
-      res.json({success, authtoken }); 
-      
-      // Send token in JSON response
+      success = true;
+      res.json({ success, authtoken });
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("An error occurred");
+      res.status(500).send("Internal Server Error");
     }
   }
 );
 
-// ROUTE:2   Login a user using: POST "/api/auth/login". No login required
+// ROUTE:2  Authenticate a user using: POST "/api/auth/login"
 router.post(
-  "/userlogin",
+  "/login",
   [
     body("email", "Enter valid email").isEmail(),
-    body("password", "Password cannot be null").exists(),
+    body("password", "Password cannot be blank").exists(),
   ],
   async (req, res) => {
     let success = false;
@@ -73,21 +75,18 @@ router.post(
     }
 
     const { email, password } = req.body;
-
     try {
-      let user = await User.findOne({ email });
+      let user = await User.findOne({
+        where: { email }
+      });
+
       if (!user) {
-        return res
-          .status(400)
-          .json({ error: "Please try to login with correct credentials" });
+        return res.status(400).json({ success, error: "Please login with correct credentials" });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
       if (!passwordCompare) {
-        success= false;
-        return res
-          .status(400)
-          .json({success,  error: "Please try to login with correct credentials" });
+        return res.status(400).json({ success, error: "Please login with correct credentials" });
       }
 
       const data = {
@@ -95,27 +94,27 @@ router.post(
           id: user.id,
         },
       };
-
       const authtoken = jwt.sign(data, JWT_SECRET);
-success=true;
-      res.json({ success, authtoken }); // Send token in JSON response
-
+      success = true;
+      res.json({ success, authtoken });
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("Internal Server Error");
+      res.status(500).send("Internal Server error");
     }
   }
 );
 
-// ROUTE:3 GET loggedIn user details using: GET "/api/auth/getuser".  login required
+// ROUTE:3  Get logged-in user details using: POST "/api/auth/getuser". Login required
 router.post("/getuser", fetchUser, async (req, res) => {
   try {
-    userId = req.user.id;
-    const user = await User.findById(userId).select("-password");
-    res.send(user); // Use res.json for consistency
+    const userId = req.user.id;
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password'] }
+    });
+    res.send(user);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Internal Server Error"); // Return JSON error response
+    res.status(500).send("Internal Server Error");
   }
 });
 
