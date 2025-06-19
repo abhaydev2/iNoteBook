@@ -1,0 +1,33 @@
+// controllers/notesController.js
+import { createNote, updateNote, deleteNote } from '../models/notesModel.js';
+
+export const create = async (req, res) => {
+  const { title, description, category } = req.body;
+  try {
+    const note = await createNote(req.user.id, title, description, category);
+    res.status(201).json(note);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const edit = async (req, res) => {
+  const { id } = req.params;
+  const { title, description, category } = req.body;
+  try {
+    const note = await updateNote(id, title, description, category);
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const remove = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteNote(id);
+    res.json({ message: 'Note deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
