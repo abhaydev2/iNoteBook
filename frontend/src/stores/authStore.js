@@ -1,115 +1,86 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import axios from 'axios';
+import API_ENDPOINTS from '../config/api.config';
+
+axios.defaults.withCredentials = true; // 👈 Always send cookies
 
 const useAuthStore = create(
   persist(
     (set, get) => ({
-      // State
       user: null,
-      token: null,
+      token: null, // Optional: if you also store token in cookie, not state
       isAuthenticated: false,
       loading: false,
       error: null,
 
-      // Actions
+      // Login function
       login: async (email, password) => {
         set({ loading: true, error: null });
-        
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Dummy authentication - in real app, this would be an API call
-          if (email && password) {
-            const userData = {
-              id: 1,
-              email: email,
-              name: email.split('@')[0],
-              avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`,
-              createdAt: new Date().toISOString(),
-            };
-            
-            const token = `dummy-token-${Date.now()}`;
-            
-            set({
-              user: userData,
-              token: token,
-              isAuthenticated: true,
-              loading: false,
-              error: null,
-            });
-            
-            return { success: true, user: userData };
-          } else {
-            throw new Error('Invalid credentials');
-          }
-        } catch (error) {
-          set({
-            loading: false,
-            error: error.message,
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          });
-          
-          return { success: false, error: error.message };
-        }
-      },
+          const { data } = await axios.post(
+            API_ENDPOINTS.AUTH.LOGIN,
+            { email, password },
+            { withCredentials: true } // 👈 ensures cookie is sent
+          );
 
-      signup: async (email, password, confirmPassword) => {
-        set({ loading: true, error: null });
-        
-        try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Basic validation
-          if (!email || !password || !confirmPassword) {
-            throw new Error('All fields are required');
-          }
-          
-          if (password !== confirmPassword) {
-            throw new Error('Passwords do not match');
-          }
-          
-          if (password.length < 6) {
-            throw new Error('Password must be at least 6 characters');
-          }
-          
-          // Dummy signup - in real app, this would be an API call
-          const userData = {
-            id: Date.now(),
-            email: email,
-            name: email.split('@')[0],
-            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`,
-            createdAt: new Date().toISOString(),
-          };
-          
-          const token = `dummy-token-${Date.now()}`;
-          
           set({
-            user: userData,
-            token: token,
+            user: data.user,
             isAuthenticated: true,
             loading: false,
             error: null,
           });
-          
-          return { success: true, user: userData };
-        } catch (error) {
+
+          return { success: true, user: data.user };
+        } catch (err) {
           set({
             loading: false,
-            error: error.message,
+            error: err.response?.data?.error || 'Login failed',
             user: null,
-            token: null,
             isAuthenticated: false,
           });
-          
-          return { success: false, error: error.message };
+
+          return { success: false, error: err.response?.data?.error || 'Login failed' };
         }
       },
 
-      logout: () => {
+      // Signup function
+      signup: async (email, password, fullname) => {
+        set({ loading: true, error: null });
+        try {
+          const { data } = await axios.post(
+            API_ENDPOINTS.AUTH.SIGNUP,
+            { email, password, fullname },
+            { withCredentials: true }
+          );
+
+          set({
+            user: data.user,
+            isAuthenticated: true,
+            loading: false,
+            error: null,
+          });
+
+          return { success: true, user: data.user };
+        } catch (err) {
+          set({
+            loading: false,
+            error: err.response?.data?.error || 'Signup failed',
+            user: null,
+            isAuthenticated: false,
+          });
+
+          return { success: false, error: err.response?.data?.error || 'Signup failed' };
+        }
+      },
+
+      logout: async () => {
+        try {
+          await axios.post(`${API_ENDPOINTS.AUTH.LOGOUT}`, {}, { withCredentials: true });
+        } catch (_) {
+          // Ignore errors
+        }
+
         set({
           user: null,
           token: null,
@@ -123,17 +94,14 @@ const useAuthStore = create(
         set({ error: null });
       },
 
-      // Helper to check if user is authenticated
       checkAuth: () => {
-        const { token } = get();
-        return !!token;
+        return !!get().user;
       },
     }),
     {
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
     }

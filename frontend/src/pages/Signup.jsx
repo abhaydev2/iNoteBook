@@ -1,198 +1,136 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { clsx } from 'clsx';
 import useAuthStore from '../stores/authStore';
+import clsx from 'clsx';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
+    fullname: '',
     email: '',
     password: '',
-    confirmPassword: '',
   });
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
   const { signup, loading, error, isAuthenticated, clearError } = useAuthStore();
-  
-  // Redirect if already authenticated
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/mynotes', { replace: true });
     }
   }, [isAuthenticated, navigate]);
-  
-  // Clear error when component mounts
+
   useEffect(() => {
     clearError();
   }, [clearError]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [e.target.name]: e.target.value,
     }));
-    // Clear error when user starts typing
-    if (error) {
-      clearError();
-    }
+    clearError();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const result = await signup(formData.email, formData.password, formData.confirmPassword);
-    
-    if (result.success) {
-      navigate('/mynotes', { replace: true });
-    }
+    const { fullname, email, password } = formData;
+    if (!fullname || !email || !password) return alert('All fields are required');
+    if (password.length < 6) return alert('Password must be at least 6 characters');
+    const result = await signup(email, password, fullname);
+    if (result.success) navigate('/mynotes');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-            </div>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
               to="/login"
-              className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              className="text-primary-600 dark:text-primary-400 hover:underline"
             >
               sign in to your existing account
             </Link>
           </p>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className={clsx(
-                  'input-field mt-1',
-                  error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
-                )}
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className={clsx(
-                  'input-field mt-1',
-                  error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
-                )}
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                className={clsx(
-                  'input-field mt-1',
-                  error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
-                )}
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
 
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <div className="flex">
-                <svg className="w-5 h-5 text-red-400 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5C2.962 18.333 3.924 20 5.464 20z" />
-                </svg>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                    Sign up failed
-                  </h3>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                    {error}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <button
-              type="submit"
-              disabled={loading}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+            <input
+              type="text"
+              name="fullname"
+              value={formData.fullname}
+              onChange={handleChange}
+              required
               className={clsx(
-                'w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white transition-colors duration-200',
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900'
+                'input-field mt-1',
+                error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
               )}
+              placeholder="Enter your full name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className={clsx(
+                'input-field mt-1',
+                error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
+              )}
+              placeholder="Enter your email"
+            />
+          </div>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className={clsx(
+                'input-field mt-1 pr-10',
+                error && 'border-red-300 dark:border-red-600 focus:ring-red-500'
+              )}
+              placeholder="Enter password"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-9 text-gray-500 dark:text-gray-300 focus:outline-none"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {loading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating account...
-                </div>
+              {showPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0zm6.062-4.675A9.956 9.956 0 0122 9c0 5.523-4.477 10-10 10a9.956 9.956 0 01-4.675-.938" /></svg>
               ) : (
-                'Create account'
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0m2.021-2.021A9.956 9.956 0 0122 12c0 5.523-4.477 10-10 10S2 17.523 2 12c0-1.657.336-3.236.938-4.675M9.879 9.879A3 3 0 0115 12m-6 0a3 3 0 016 0m-6 0a3 3 0 006 0" /></svg>
               )}
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Demo: Use any email and password to create an account
-            </p>
-          </div>
+          {error && (
+            <p className="text-red-600 text-sm bg-red-100 p-2 rounded">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={clsx(
+              'w-full py-3 px-4 rounded-lg text-white text-sm font-medium',
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'
+            )}
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </button>
         </form>
       </div>
     </div>

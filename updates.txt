@@ -1,6 +1,0 @@
-theme switcher
-
-improve UI - griod view
-
-forget password
-
