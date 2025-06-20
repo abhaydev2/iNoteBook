@@ -8,7 +8,7 @@ const MyNotes = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newNote, setNewNote] = useState({
     title: '',
-    content: '',
+    description: '',
     category: 'personal',
   });
   
@@ -31,7 +31,7 @@ const MyNotes = () => {
   // Fetch notes on component mount
   useEffect(() => {
     if (user) {
-      fetchNotes(user.id);
+      fetchNotes(); // No user.id needed, backend uses token
     }
   }, [user, fetchNotes]);
   
@@ -45,7 +45,7 @@ const MyNotes = () => {
   const handleCreateNote = async (e) => {
     e.preventDefault();
     
-    if (!newNote.title.trim() || !newNote.content.trim()) {
+    if (!newNote.title.trim() || !newNote.description.trim()) {
       return;
     }
     
@@ -54,7 +54,7 @@ const MyNotes = () => {
     if (result.success) {
       setNewNote({
         title: '',
-        content: '',
+        description: '',
         category: 'personal',
       });
       setIsCreateModalOpen(false);
@@ -65,7 +65,7 @@ const MyNotes = () => {
     setIsCreateModalOpen(false);
     setNewNote({
       title: '',
-      content: '',
+      description: '',
       category: 'personal',
     });
   };
@@ -95,7 +95,7 @@ const MyNotes = () => {
                 My Notes
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Welcome back, {user?.name}! You have {notes.length} notes.
+                Welcome back, {user?.fullname || user?.name || 'User'}! You have {notes.length} notes.
               </p>
             </div>
             <button
@@ -264,8 +264,8 @@ const MyNotes = () => {
                     Content
                   </label>
                   <textarea
-                    value={newNote.content}
-                    onChange={(e) => setNewNote(prev => ({ ...prev, content: e.target.value }))}
+                    value={newNote.description}
+                    onChange={(e) => setNewNote(prev => ({ ...prev, description: e.target.value }))}
                     className="input-field min-h-[120px] resize-none"
                     placeholder="Write your note content here..."
                     required

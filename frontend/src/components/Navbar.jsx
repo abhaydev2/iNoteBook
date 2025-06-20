@@ -105,9 +105,7 @@ const Navbar = () => {
                   <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
                     {profileLetter}
                   </div>
-                  {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {localUser?.fullname}
-                  </span> */}
+                 
                 </div>
                 <button
                   onClick={handleLogout}

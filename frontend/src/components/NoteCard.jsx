@@ -57,15 +57,21 @@ const NoteCard = ({ note }) => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     });
   };
 
   const truncateContent = (content, maxLength = 150) => {
+    if (!content) return '';
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
@@ -149,8 +155,8 @@ const NoteCard = ({ note }) => {
 
         {/* Content */}
         <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-          {isExpanded ? note.content : truncateContent(note.content)}
-          {note.content.length > 150 && (
+          {isExpanded ? (note.content || '') : truncateContent(note.content)}
+          {(note.content && note.content.length > 150) && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="ml-2 text-primary-600 dark:text-primary-400 hover:underline text-sm font-medium"
@@ -162,9 +168,9 @@ const NoteCard = ({ note }) => {
 
         {/* Footer */}
         <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-          <span>Created {formatDate(note.createdAt)}</span>
-          {note.updatedAt !== note.createdAt && (
-            <span>Updated {formatDate(note.updatedAt)}</span>
+          <span>Created {formatDate(note.created_at)}</span>
+          {note.updated_at !== note.created_at && (
+            <span>Updated {formatDate(note.updated_at)}</span>
           )}
         </div>
       </div>

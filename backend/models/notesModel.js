@@ -11,7 +11,7 @@ export const getNotesByUserId = async (userId) => {
 
 export const createNote = async (userId, title, description, category) => {
   const result = await pool.query(
-    'INSERT INTO notes (user_id, title, description, category) VALUES ($1, $2, $3, $4) RETURNING *',
+    'INSERT INTO notes (user_id, title, description, category, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *',
     [userId, title, description, category]
   );
   return result.rows[0];
@@ -19,7 +19,7 @@ export const createNote = async (userId, title, description, category) => {
 
 export const updateNote = async (noteId, title, description, category) => {
   const result = await pool.query(
-    'UPDATE notes SET title = $1, description = $2, category = $3 WHERE id = $4 RETURNING *',
+    'UPDATE notes SET title = $1, description = $2, category = $3, updated_at = NOW() WHERE id = $4 RETURNING *',
     [title, description, category, noteId]
   );
   return result.rows[0];

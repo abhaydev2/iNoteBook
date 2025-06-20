@@ -6,14 +6,13 @@ export const API_ENDPOINTS = {
   AUTH: {
     SIGNUP: `${API_BASE_URL}/users/signup`,
     LOGIN: `${API_BASE_URL}/users/login`,
-      LOGOUT: `${API_BASE_URL}/users/logout`, // <-- Add this
+    LOGOUT: `${API_BASE_URL}/users/logout`,
   },
   NOTES: {
-    BASE: `${API_BASE_URL}/notes`,
-    CREATE: `${API_BASE_URL}/notes`,
-    GET_ALL: `${API_BASE_URL}/notes`,
-    UPDATE: `${API_BASE_URL}/notes`,
-    DELETE: `${API_BASE_URL}/notes`,
+    GET_ALL: `${API_BASE_URL}/notes/getnotes`,
+    CREATE: `${API_BASE_URL}/notes/create`,
+    UPDATE: `${API_BASE_URL}/notes/edit`,
+    DELETE: `${API_BASE_URL}/notes/delete`,
   },
 };
 

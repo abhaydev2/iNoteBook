@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import axios from 'axios';
+import API_ENDPOINTS from '../config/api.config';
 
 const useNotesStore = create(
   persist(
@@ -21,86 +23,36 @@ const useNotesStore = create(
       ],
 
       // Actions
-      fetchNotes: async (userId) => {
+      fetchNotes: async () => {
         set({ loading: true, error: null });
-        
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Dummy notes data - in real app, this would be an API call
-          const dummyNotes = [
-            {
-              id: 1,
-              title: 'Welcome to NoteMaker!',
-              content: 'This is your first note. You can create, edit, and delete notes to organize your thoughts and ideas.',
-              category: 'personal',
-              createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-              updatedAt: new Date(Date.now() - 86400000).toISOString(),
-              isPinned: true,
-            },
-            {
-              id: 2,
-              title: 'Meeting Notes - Q1 Planning',
-              content: 'Discuss quarterly goals, budget allocation, and team expansion plans. Key points: increase revenue by 15%, hire 2 new developers, launch mobile app.',
-              category: 'work',
-              createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-              updatedAt: new Date(Date.now() - 172800000).toISOString(),
-              isPinned: false,
-            },
-            {
-              id: 3,
-              title: 'Recipe Ideas',
-              content: 'Try making pasta with homemade pesto, grilled chicken with herbs, and chocolate chip cookies for dessert.',
-              category: 'personal',
-              createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-              updatedAt: new Date(Date.now() - 259200000).toISOString(),
-              isPinned: false,
-            },
-            {
-              id: 4,
-              title: 'App Feature Ideas',
-              content: 'Add dark mode toggle, implement search functionality, create note categories, add export options.',
-              category: 'ideas',
-              createdAt: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
-              updatedAt: new Date(Date.now() - 345600000).toISOString(),
-              isPinned: false,
-            },
-          ];
-          
-          set({ notes: dummyNotes, loading: false });
-          
-          return { success: true, notes: dummyNotes };
+          const { data } = await axios.get(API_ENDPOINTS.NOTES.GET_ALL, { withCredentials: true });
+          // Map description to content for frontend compatibility
+          const mappedNotes = Array.isArray(data)
+            ? data.map(note => ({ ...note, content: note.content || note.description || '' }))
+            : [];
+          set({ notes: mappedNotes, loading: false });
+          return { success: true, notes: mappedNotes };
         } catch (error) {
-          set({ loading: false, error: error.message });
-          return { success: false, error: error.message };
+          set({ loading: false, error: error.response?.data?.message || error.message });
+          return { success: false, error: error.response?.data?.message || error.message };
         }
       },
 
       addNote: async (noteData) => {
         set({ loading: true, error: null });
-        
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          const newNote = {
-            id: Date.now(),
-            ...noteData,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isPinned: false,
-          };
-          
+          const { data } = await axios.post(API_ENDPOINTS.NOTES.CREATE, noteData, { withCredentials: true });
+          // Map description to content for frontend compatibility
+          const mappedNote = { ...data, content: data.content || data.description || '' };
           set(state => ({
-            notes: [newNote, ...state.notes],
+            notes: [mappedNote, ...state.notes],
             loading: false,
           }));
-          
-          return { success: true, note: newNote };
+          return { success: true, note: mappedNote };
         } catch (error) {
-          set({ loading: false, error: error.message });
-          return { success: false, error: error.message };
+          set({ loading: false, error: error.response?.data?.message || error.message });
+          return { success: false, error: error.response?.data?.message || error.message };
         }
       },
 

@@ -3,6 +3,9 @@ import { createNote, updateNote, deleteNote, getNotesByUserId } from '../models/
 
 export const create = async (req, res) => {
   const { title, description, category } = req.body;
+  if (!title || !description || !category) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
   try {
     const note = await createNote(req.user.id, title, description, category);
     res.status(201).json(note);
