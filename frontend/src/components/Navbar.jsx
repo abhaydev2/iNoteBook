@@ -29,6 +29,20 @@ const Navbar = () => {
     return location.pathname.startsWith(path);
   };
 
+  const getLocalUser = () => {
+    try {
+      const persisted = localStorage.getItem('auth-storage');
+      if (!persisted) return null;
+      const parsed = JSON.parse(persisted).state || JSON.parse(persisted);
+      return parsed.user || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const localUser = isAuthenticated ? (user || getLocalUser()) : null;
+  const profileLetter = localUser?.fullname ? localUser.fullname.charAt(0).toUpperCase() : '';
+
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,14 +102,12 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
-                  <img
-                    src={user?.avatar}
-                    alt={user?.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {user?.name}
-                  </span>
+                  <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
+                    {profileLetter}
+                  </div>
+                  {/* <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {localUser?.fullname}
+                  </span> */}
                 </div>
                 <button
                   onClick={handleLogout}
