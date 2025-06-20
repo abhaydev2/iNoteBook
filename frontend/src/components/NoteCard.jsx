@@ -149,12 +149,12 @@ const NoteCard = ({ note }) => {
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
           {note.title}
-        </h3>
+        </h2>
 
         {/* Content */}
-        <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
           {isExpanded ? (note.content || '') : truncateContent(note.content)}
           {(note.content && note.content.length > 150) && (
             <button

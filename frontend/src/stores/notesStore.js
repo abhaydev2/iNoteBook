@@ -58,43 +58,45 @@ const useNotesStore = create(
 
       updateNote: async (noteId, updates) => {
         set({ loading: true, error: null });
-        
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          // Map content to description for backend
+          const payload = { ...updates };
+          if (payload.content !== undefined) {
+            payload.description = payload.content;
+            delete payload.content;
+          }
+          const { data } = await axios.put(
+            `${API_ENDPOINTS.NOTES.UPDATE}/${noteId}`,
+            payload,
+            { withCredentials: true }
+          );
+          // Map description to content for frontend compatibility
+          const mappedNote = { ...data, content: data.content || data.description || '' };
           set(state => ({
             notes: state.notes.map(note =>
-              note.id === noteId
-                ? { ...note, ...updates, updatedAt: new Date().toISOString() }
-                : note
+              note.id === noteId ? mappedNote : note
             ),
             loading: false,
           }));
-          
           return { success: true };
         } catch (error) {
-          set({ loading: false, error: error.message });
-          return { success: false, error: error.message };
+          set({ loading: false, error: error.response?.data?.message || error.message });
+          return { success: false, error: error.response?.data?.message || error.message };
         }
       },
 
       deleteNote: async (noteId) => {
         set({ loading: true, error: null });
-        
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          await axios.delete(`${API_ENDPOINTS.NOTES.DELETE}/${noteId}`, { withCredentials: true });
           set(state => ({
             notes: state.notes.filter(note => note.id !== noteId),
             loading: false,
           }));
-          
           return { success: true };
         } catch (error) {
-          set({ loading: false, error: error.message });
-          return { success: false, error: error.message };
+          set({ loading: false, error: error.response?.data?.message || error.message });
+          return { success: false, error: error.response?.data?.message || error.message };
         }
       },
 

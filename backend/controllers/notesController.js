@@ -17,6 +17,10 @@ export const create = async (req, res) => {
 export const edit = async (req, res) => {
   const { id } = req.params;
   const { title, description, category } = req.body;
+  if (!title || !description || !category) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
   try {
     const note = await updateNote(id, title, description, category);
     res.json(note);
