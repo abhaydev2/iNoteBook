@@ -3,7 +3,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../models/userModel.js';
 import dotenv from 'dotenv';
-
+import crypto from 'crypto';
+import {
+  updateUserResetToken,
+  findUserByResetToken,
+  updateUserPassword,
+} from '../models/userModel.js';
+import sendEmail from '../config/sendEmail.js'; // you’ll create this file
 dotenv.config();
 
 export const signup = async (req, res) => {
@@ -75,4 +81,59 @@ export const logout = async (req, res) => {
     secure: process.env.NODE_ENV === 'production',
   });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
+};
+
+export const sendResetPasswordEmail = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+    await updateUserResetToken(user.email, hashedToken, expires);
+
+    const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    await sendEmail({
+      to: email,
+      subject: 'iNoteBook Password Reset',
+      html: `
+        <p>Click the link below to reset your password:</p>
+        <a href="${resetURL}">${resetURL}</a>
+        <p>This link is valid for 15 minutes only.</p>
+      `
+    });
+
+    res.json({ success: true, message: 'Password reset email sent' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send reset email: ' + err.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  if (!token || !password) return res.status(400).json({ error: 'Token and password required' });
+
+  try {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await findUserByResetToken(hashedToken);
+
+    if (!user || user.reset_token_expires < new Date()) {
+      return res.status(400).json({ error: 'Token is invalid or expired' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await updateUserPassword(user.id, hashedPassword);
+
+    res.json({ success: true, message: 'Password has been reset successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Password reset failed: ' + err.message });
+  }
 };
