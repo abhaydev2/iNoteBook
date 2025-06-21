@@ -97,6 +97,23 @@ const useAuthStore = create(
       checkAuth: () => {
         return !!get().user;
       },
+
+      // Reset password request function
+      resetPasswordRequest: async (email) => {
+        try {
+          const { data } = await axios.post(
+            `${API_BASE_URL}/users/reset-password`,
+            { email },
+            { withCredentials: true }
+          );
+          return { success: data.success };
+        } catch (err) {
+          return {
+            success: false,
+            error: err.response?.data?.error || 'Failed to send reset link.'
+          };
+        }
+      },
     }),
     {
       name: 'auth-storage',

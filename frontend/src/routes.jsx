@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyNotes from './pages/MyNotes';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForgetPassword from './pages/ForgetPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,14 @@ const router = createBrowserRouter([
             <MyNotes />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: '/forgetPassword',
+        element: <ForgetPassword />,
+      },
+      {
+        path: '/reset-password/:token',
+        element: <ResetPassword />,
       },
     ],
   },
