@@ -18,7 +18,7 @@ const Home = () => {
             </h1>
             
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-in">
-              Create, organize, and manage your notes effortlessly. Whether it's for work, personal projects, or creative ideas, NoteMaker helps you capture and organize your thoughts in a beautiful, intuitive interface.
+              Create, organize, and do manage your notes effortlessly. Whether it's for work, personal projects, or creative ideas, NoteMaker helps you capture and organize your thoughts in a beautiful, intuitive interface.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in">
