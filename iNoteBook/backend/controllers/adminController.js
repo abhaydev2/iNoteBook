@@ -101,9 +101,22 @@ export const getData = async (req, res) => {
       ORDER BY date_trunc('month', created_at)
     `);
     const chartData = chartResult.rows;
-    // Get two latest users by id
-    const latestUsersResult = await pool.query('SELECT fullname FROM users ORDER BY id DESC LIMIT 2');
-    const latestUsers = latestUsersResult.rows.map(row => row.fullname);
+    // Get three latest users with their creation time
+    const latestUsersResult = await pool.query(`
+      SELECT fullname, 
+             created_at,
+             to_char(created_at, 'HH12:MI AM') as time,
+             to_char(created_at, 'Mon DD, YYYY') as date
+      FROM users 
+      ORDER BY id DESC 
+      LIMIT 3
+    `);
+    const latestUsers = latestUsersResult.rows.map(row => ({
+      fullname: row.fullname,
+      time: row.time,
+      date: row.date,
+      created_at: row.created_at
+    }));
     res.json({
       totalUsers,
       totalNotes,
@@ -160,6 +173,79 @@ export const sendAnouncement = async (req, res) => {
       success: false,
       message: 'Server error while sending announcement',
       error: err.message
+    });
+  }
+};
+
+export const addAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required.' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      'INSERT INTO admin (email, password) VALUES ($1, $2) RETURNING id, email',
+      [email, hashedPassword]
+    );
+    res.status(201).json({ success: true, admin: result.rows[0] });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ success: false, message: 'Admin already exists.' });
+    }
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { email, currentPassword, newPassword } = req.body;
+    
+    // Validate all required fields
+    if (!email || !currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email, current password, and new password are required.' 
+      });
+    }
+
+    // Find admin by email
+    const result = await pool.query('SELECT * FROM admin WHERE email = $1', [email]);
+    const admin = result.rows[0];
+    
+    if (!admin) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Admin not found with this email.' 
+      });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Current password is incorrect.' 
+      });
+    }
+
+    // Hash and update new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      'UPDATE admin SET password = $1 WHERE email = $2', 
+      [hashedNewPassword, email]
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Password updated successfully.' 
+    });
+  } catch (err) {
+    console.error('Error updating password:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error while updating password', 
+      error: err.message 
     });
   }
 };
