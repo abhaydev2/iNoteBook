@@ -2,6 +2,7 @@
 import pool from '../config/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import  sendEmail  from '../config/sendEmail.js'; // Assuming you have a utility function to send emails
 
 // 1. Insert Admin
 export const insertAdmin = async (req, res) => {
@@ -114,5 +115,51 @@ export const getData = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+};
+
+export const sendAnouncement = async (req, res) => {
+  try {
+    const { subject, emailBody } = req.body;
+
+    // Validate input
+    if (!subject || !emailBody) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Subject and email body are required.' 
+      });
+    }
+
+    // Get all user emails from the database
+    const result = await pool.query('SELECT email FROM users');
+    const userEmails = result.rows.map(row => row.email);
+
+    if (userEmails.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No users found in the database.'
+      });
+    }
+
+    // Send email to all users
+    await Promise.all(userEmails.map(email => 
+      sendEmail({
+        to: email,
+        subject: subject,
+        html: emailBody
+      })
+    ));
+
+    res.json({
+      success: true,
+      message: `Announcement sent successfully to ${userEmails.length} users.`
+    });
+  } catch (err) {
+    console.error('Error sending announcement:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while sending announcement',
+      error: err.message
+    });
   }
 };

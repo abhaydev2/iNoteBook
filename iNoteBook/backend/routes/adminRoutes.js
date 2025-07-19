@@ -1,5 +1,5 @@
 import express from 'express';
-import { insertAdmin, loginAdmin, logoutAdmin, getData } from '../controllers/adminController.js';
+import { insertAdmin, loginAdmin, logoutAdmin, getData, sendAnouncement } from '../controllers/adminController.js';
 
 const router = express.Router();
 
@@ -14,5 +14,7 @@ router.post('/logout', logoutAdmin);
 
 // GET /api/admin/dashboard-data
 router.get('/dashboard-data', getData);
+
+router.post('/send-announcement', sendAnouncement);
 
 export default router;

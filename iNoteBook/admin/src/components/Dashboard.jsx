@@ -65,13 +65,21 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Dashboard Overview
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Welcome back! Here's what's happening with your platform.
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Welcome back! Here's what's happening with your platform.
+          </p>
+        </div>
+        <a 
+          href="/send-announcement" 
+          className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors duration-150 ease-in-out"
+        >
+          Send Announcement
+        </a>
       </div>
 
       {/* Stats Cards */}
