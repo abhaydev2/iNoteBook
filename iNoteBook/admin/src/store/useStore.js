@@ -76,18 +76,20 @@ const useStore = create((set, get) => ({
       });
       const data = await res.json();
       if (data && typeof data === 'object') {
-        // Set notifications from latestUsers
+        // Set notifications from latestUsers with time information
         const notifications = Array.isArray(data.latestUsers)
-          ? data.latestUsers.map((fullname, idx) => ({
+          ? data.latestUsers.map((user, idx) => ({
               id: idx + 1,
-              user: fullname,
-              joinedAt: 'Just now',
-              avatar: fullname
+              user: user.fullname,
+              joinedAt: `${user.time} • ${user.date}`,
+              avatar: user.fullname
                 .split(' ')
                 .map((n) => n[0])
                 .join('')
                 .toUpperCase()
                 .slice(0, 2),
+              time: user.time,
+              date: user.date
             }))
           : [];
         set({

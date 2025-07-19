@@ -79,9 +79,14 @@ const Navbar = () => {
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
                               {notification.user}
                             </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Joined {notification.joinedAt}
-                            </p>
+                            <div className="flex flex-col">
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
+                                Joined at {notification.time}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {notification.date}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
