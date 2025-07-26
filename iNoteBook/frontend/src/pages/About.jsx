@@ -19,7 +19,7 @@ const About = () => {
             <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
               At NoteMaker, we believe that great ideas deserve great tools. We're dedicated to providing a simple, elegant, and powerful platform for capturing, organizing, and finding your notes whenever you need them.
             </p>
-            <p className="text-gray-60 dark:text-gray-400 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
               Whether you're a student, professional, writer, or creative thinker, NoteMaker adapts to your workflow and helps you stay organized without getting in your way.
             </p>
           </div>
