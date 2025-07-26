@@ -35,7 +35,7 @@ const Home = () => {
                     to="/signup"
                     className="btn-primary text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                   >
-                    Get Started Free
+                    Get Started Fre
                   </Link>
                   <Link
                     to="/login"
