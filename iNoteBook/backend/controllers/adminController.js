@@ -127,7 +127,7 @@ export const getData = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    res.status(50).json({ success: false, message: 'Server error', error: err.message });
   }
 };
 
