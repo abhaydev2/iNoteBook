@@ -53,7 +53,7 @@ const ResetPassword = () => {
             disabled={loading}
           />
         </div>
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+        {error && <div className="text-red-500cd text-sm mb-2">{error}</div>}
         {success && <div className="text-green-500 text-sm mb-2">{success}</div>}
         <button
           type="submit"
