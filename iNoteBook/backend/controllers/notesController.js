@@ -35,7 +35,7 @@ export const remove = async (req, res) => {
     await deleteNote(id);
     res.json({ message: 'Note deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(50).json({ message: err.message });
   }
 };
 
