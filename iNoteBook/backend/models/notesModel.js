@@ -6,7 +6,7 @@ export const getNotesByUserId = async (userId) => {
     'SELECT * FROM notes WHERE user_id = $1 ',
     [userId]
   );
-  return result.rows;
+  
 };
 
 export const createNote = async (userId, title, description, category) => {
