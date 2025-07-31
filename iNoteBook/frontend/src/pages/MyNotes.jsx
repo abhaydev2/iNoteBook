@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { clsx } from 'clsx';
 import useAuthStore from '../stores/authStore';
 import useNotesStore from '../stores/notesStore';
 import NoteCard from '../components/NoteCard';
