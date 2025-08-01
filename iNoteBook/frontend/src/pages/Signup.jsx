@@ -129,7 +129,7 @@ const Signup = () => {
               loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'
             )}
           >
-            {loading ? 'Creatin Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
       </div>
