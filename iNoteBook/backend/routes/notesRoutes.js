@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/create', protect, create);
 router.get('/getnotes',protect, getNotes);
 router.put('/edit/:id', protect, edit);
-router.delete('/delete/:id', protect, remoe);
+router.delete('/delete/:id', protect, remove);
 
 export default router;
